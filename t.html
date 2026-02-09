@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Sleep Tracker</title>
+  <style>
+    :root{
+      --bg:#f6f8fc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --muted2:#94a3b8;
+      --line:#e2e8f0;
+      --soft:#f1f5f9;
+      --blue:#3b82f6;
+      --blue2:#2563eb;
+      --shadow: 0 18px 55px rgba(2, 6, 23, 0.10);
+      --shadow2: 0 6px 18px rgba(2, 6, 23, 0.06);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box }
+
+    body{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(700px 400px at 50% -10%, rgba(59,130,246,.18) 0%, rgba(59,130,246,0) 60%),
+        var(--bg);
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      margin:0;
+      padding: 18px;
+    }
+
+    .card{
+      width: 360px;
+      background: linear-gradient(180deg, #fff 0%, #fff 65%, rgba(255,255,255,.96) 100%);
+      border: 1px solid rgba(226,232,240,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 16px;
+    }
+
+    h2{
+      margin:0;
+      font-weight:800;
+      font-size: 1.05rem;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin:4px 0 0;
+      font-size:.82rem;
+      color: var(--muted);
+      line-height:1.2rem;
+    }
+
+    .pill{
+      padding:8px 10px;
+      font-size:.78rem;
+      font-weight:800;
+      color: rgba(37,99,235,.95);
+      background: rgba(59,130,246,.10);
+      border: 1px solid rgba(59,130,246,.22);
+      border-radius: 999px;
+      white-space:nowrap;
+      box-shadow: var(--shadow2);
+    }
+
+    .time-group{ margin-top: 12px; }
+
+    label{
+      display:block;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--muted2);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field{
+      width:100%;
+      padding: 12px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 1.05rem;
+      color: var(--text);
+      outline: none;
+      background: var(--soft);
+    }
+
+    .inline{
+      display:grid;
+      grid-template-columns: 1fr 120px;
+      gap: 10px;
+      align-items:end;
+    }
+
+    .btn{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(59,130,246,.25);
+      background: linear-gradient(180deg, rgba(59,130,246,.16), rgba(37,99,235,.14));
+      color: rgba(15,23,42,.95);
+      font-weight: 900;
+      cursor:pointer;
+      box-shadow: var(--shadow2);
+      transition: transform .08s ease, filter .15s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn:hover{ filter: brightness(1.02); }
+
+    .result{
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(226,232,240,.85);
+      display:grid;
+      gap: 10px;
+    }
+
+    .resultBox{
+      border-radius: 14px;
+      border: 1px solid rgba(226,232,240,.9);
+      background: linear-gradient(180deg, rgba(241,245,249,.85), rgba(241,245,249,.55));
+      padding: 14px 14px;
+    }
+
+    .result-label{
+      font-size: 0.72rem;
+      color: var(--muted2);
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .bigTime{
+      margin-top: 6px;
+      font-size: 2.05rem;
+      font-weight: 1000;
+      color: var(--blue2);
+      letter-spacing: .5px;
+    }
+
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .meta b{ color: var(--text); }
+
+    .footer-note{
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: rgba(100,116,139,.9);
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div>
+      <h2>Sleep Tracker</h2>
+      <div class="subtitle">Choose Sleep or Wake time — the other updates instantly.</div>
+    </div>
+    <div class="pill" id="nowPill">Now: --:--</div>
+  </div>
+
+  <div class="time-group">
+    <div class="row">
+      <div>
+        <label>I will go to sleep at</label>
+        <input type="time" id="sleepInput" class="field">
+      </div>
+      <div>
+        <label>I will wake up at</label>
+        <input type="time" id="wakeInput" class="field">
+      </div>
+    </div>
+  </div>
+
+  <div class="time-group">
+    <label>Sleep duration (hours)</label>
+    <div class="inline">
+      <input type="number" id="durationInput" class="field" value="8" min="1" max="12" step="0.25">
+      <button class="btn" id="refreshBtn">Refresh</button>
+    </div>
+  </div>
+
+  <div class="result">
+    <div class="resultBox">
+      <div class="result-label">Wake up at</div>
+      <div class="bigTime" id="wakeTimeDisplay">--:--</div>
+      <div class="meta">
+        <div>Sleep: <b id="sleepShown">--:--</b></div>
+        <div>Ends in: <b id="endsIn">--</b></div>
+      </div>
+    </div>
+
+    <div class="footer-note">Tip: Press <b>Refresh</b> to set Sleep = <b>now</b> (and Wake = now + duration).</div>
+  </div>
+</div>
+
+<script>
+  const sleepInput = document.getElementById('sleepInput');
+  const wakeInput = document.getElementById('wakeInput');
+  const durationInput = document.getElementById('durationInput');
+
+  const wakeTimeDisplay = document.getElementById('wakeTimeDisplay');
+  const refreshBtn = document.getElementById('refreshBtn');
+
+  const nowPill = document.getElementById('nowPill');
+  const sleepShown = document.getElementById('sleepShown');
+  const endsIn = document.getElementById('endsIn');
+
+  let lastEdited = 'sleep';
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  function formatAMPM(date) {
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return hours + ':' + pad2(minutes) + ' ' + ampm;
+  }
+
+  function nowToTimeValue(){
+    const now = new Date();
+    return pad2(now.getHours()) + ":" + pad2(now.getMinutes());
+  }
+
+  function timeValueToMinutes(val){
+    if (!val) return null;
+    const parts = val.split(':');
+    if (parts.length !== 2) return null;
+    const h = Number(parts[0]);
+    const m = Number(parts[1]);
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+    return (h * 60 + m) % 1440;
+  }
+
+  function minutesToTimeValue(min){
+    min = ((min % 1440) + 1440) % 1440;
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return pad2(h) + ":" + pad2(m);
+  }
+
+  function minutesToDateToday(min){
+    const d = new Date();
+    d.setSeconds(0,0);
+    d.setHours(Math.floor(min/60));
+    d.setMinutes(min%60);
+    return d;
+  }
+
+  function addMinutes(min, delta){
+    return ((min + delta) % 1440 + 1440) % 1440;
+  }
+
+  function calcEndsIn(wakeMin){
+    const now = new Date();
+    const nowMin = now.getHours()*60 + now.getMinutes();
+
+    let diffMin = wakeMin - nowMin;
+    if (diffMin < 0) diffMin += 1440;
+
+    const h = Math.floor(diffMin / 60);
+    const m = diffMin % 60;
+    return `${h}h ${m}m`;
+  }
+
+  function updateNowPill(){
+    nowPill.textContent = "Now: " + formatAMPM(new Date());
+  }
+
+  function syncByLastEdited(){
+    const durH = parseFloat(durationInput.value);
+    const durM = Math.round((Number.isFinite(durH) ? durH : 8) * 60);
+
+    const sMin = timeValueToMinutes(sleepInput.value);
+    const wMin = timeValueToMinutes(wakeInput.value);
+
+    if (lastEdited === 'sleep' && sMin !== null){
+      const newW = addMinutes(sMin, durM);
+      if (document.activeElement !== wakeInput) wakeInput.value = minutesToTimeValue(newW);
+    }
+
+    if (lastEdited === 'wake' && wMin !== null){
+      const newS = addMinutes(wMin, -durM);
+      if (document.activeElement !== sleepInput) sleepInput.value = minutesToTimeValue(newS);
+    }
+  }
+
+  function render(){
+    const sMin = timeValueToMinutes(sleepInput.value);
+    const wMin = timeValueToMinutes(wakeInput.value);
+
+    if (sMin === null && wMin === null) return;
+
+    const sleepMin = (sMin !== null) ? sMin : timeValueToMinutes(sleepInput.value);
+    const wakeMin  = (wMin !== null) ? wMin : timeValueToMinutes(wakeInput.value);
+
+    if (wakeMin === null || sleepMin === null) return;
+
+    const sleepDate = minutesToDateToday(sleepMin);
+    const wakeDate  = minutesToDateToday(wakeMin);
+
+    wakeTimeDisplay.textContent = formatAMPM(wakeDate);
+    sleepShown.textContent = formatAMPM(sleepDate);
+    endsIn.textContent = calcEndsIn(wakeMin);
+
+    updateNowPill();
+  }
+
+  function recalc(){
+    syncByLastEdited();
+    render();
+  }
+
+  refreshBtn.addEventListener('click', () => {
+    const durH = parseFloat(durationInput.value);
+    const durM = Math.round((Number.isFinite(durH) ? durH : 8) * 60);
+
+    const nowMin = timeValueToMinutes(nowToTimeValue());
+    sleepInput.value = minutesToTimeValue(nowMin);
+    wakeInput.value  = minutesToTimeValue(addMinutes(nowMin, durM));
+
+    lastEdited = 'sleep';
+    render();
+  });
+
+  sleepInput.addEventListener('focus', ()=> lastEdited='sleep');
+  wakeInput.addEventListener('focus', ()=> lastEdited='wake');
+
+  sleepInput.addEventListener('input', ()=>{ lastEdited='sleep'; recalc(); });
+  wakeInput.addEventListener('input',  ()=>{ lastEdited='wake';  recalc(); });
+  durationInput.addEventListener('input', recalc);
+
+  sleepInput.value = nowToTimeValue();
+  lastEdited = 'sleep';
+  recalc();
+
+  setInterval(() => {
+    updateNowPill();
+    render();
+  }, 15000);
+</script>
+
+</body>
+</html>
